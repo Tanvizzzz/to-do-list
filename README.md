@@ -102,5 +102,4 @@ git push origin main
 
 ---
 
-## 👥 Team
-- Deep Biswas — ICEM Pune
+
