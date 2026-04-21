@@ -2,259 +2,413 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Task Manager</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0d0f14;
-      --surface: #151820;
-      --border: #252a36;
-      --accent: #00e5a0;
-      --accent2: #7c6cff;
-      --warn: #ff5e5e;
-      --text: #e8eaf0;
-      --muted: #6b7280;
-      --card: #1a1f2e;
+      --ink: #f8fbff;
+      --muted: #9fb0c8;
+      --panel: rgba(11, 18, 32, 0.82);
+      --panel-strong: rgba(14, 23, 41, 0.94);
+      --stroke: rgba(255, 255, 255, 0.14);
+      --lime: #83f7b5;
+      --cyan: #6de7ff;
+      --pink: #ff7ab6;
+      --gold: #ffd166;
+      --danger: #ff6b6b;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      font-family: 'Syne', sans-serif;
-      background: var(--bg);
-      color: var(--text);
       min-height: 100vh;
+      color: var(--ink);
+      font-family: "Syne", sans-serif;
       overflow-x: hidden;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 122, 182, 0.32), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(109, 231, 255, 0.28), transparent 26%),
+        radial-gradient(circle at 52% 88%, rgba(131, 247, 181, 0.22), transparent 28%),
+        linear-gradient(135deg, #080c17 0%, #121827 45%, #15102c 100%);
     }
 
-    /* Grid background */
     body::before {
-      content: '';
+      content: "";
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
       pointer-events: none;
-      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
     }
 
-    .container {
-      max-width: 760px;
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto -20% -34% -20%;
+      height: 52vh;
+      pointer-events: none;
+      background:
+        conic-gradient(from 120deg, rgba(255, 122, 182, 0.28), rgba(109, 231, 255, 0.3), rgba(131, 247, 181, 0.22), rgba(255, 122, 182, 0.28));
+      filter: blur(60px);
+      opacity: 0.72;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1100px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 48px 24px 80px;
+      padding: 36px 0 72px;
       position: relative;
       z-index: 1;
     }
 
-    /* ── Header ── */
-    header {
-      margin-bottom: 48px;
+    .auth-screen {
+      min-height: calc(100vh - 72px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.75fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .brand-copy {
+      max-width: 640px;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--accent);
-      background: rgba(0,229,160,0.08);
-      border: 1px solid rgba(0,229,160,0.2);
-      padding: 4px 10px;
-      border-radius: 4px;
-      letter-spacing: 0.1em;
+      gap: 8px;
+      color: var(--lime);
+      border: 1px solid rgba(131, 247, 181, 0.32);
+      background: rgba(131, 247, 181, 0.1);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
       text-transform: uppercase;
-      margin-bottom: 16px;
     }
 
     .badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--accent);
+      content: "";
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+      background: var(--lime);
+      box-shadow: 0 0 20px var(--lime);
     }
 
     h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      margin-top: 20px;
+      font-size: clamp(3rem, 9vw, 6.7rem);
+      line-height: 0.9;
+      letter-spacing: 0;
       font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
     }
 
-    h1 span { color: var(--accent); }
+    .gradient-text {
+      background: linear-gradient(90deg, var(--lime), var(--cyan), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
 
-    .subtitle {
-      margin-top: 10px;
+    .lead {
+      margin-top: 22px;
       color: var(--muted);
+      font-family: "Space Mono", monospace;
+      line-height: 1.7;
+      max-width: 560px;
       font-size: 14px;
-      font-family: 'Space Mono', monospace;
     }
 
-    /* ── Stats bar ── */
-    .stats {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
+    .auth-card,
+    .panel,
+    .task-item,
+    .pipeline {
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
-    .stat {
-      flex: 1;
-      min-width: 100px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
+    .auth-card {
+      border-radius: 8px;
+      padding: 28px;
     }
 
-    .stat-num {
-      font-size: 2rem;
-      font-weight: 800;
-      font-family: 'Space Mono', monospace;
+    .card-title {
+      font-size: 28px;
       line-height: 1;
+      margin-bottom: 8px;
     }
 
-    .stat-num.green { color: var(--accent); }
-    .stat-num.purple { color: var(--accent2); }
-    .stat-num.red { color: var(--warn); }
-
-    .stat-label {
-      font-size: 11px;
+    .card-copy {
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 4px;
-    }
-
-    /* ── Input area ── */
-    .input-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 18px;
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,229,160,0.08);
-    }
-
-    input[type="text"]::placeholder { color: var(--muted); }
-
-    .btn-add {
-      background: var(--accent);
-      color: #0d0f14;
-      border: none;
-      border-radius: 10px;
-      padding: 14px 24px;
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-
-    .btn-add:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,229,160,0.25);
-    }
-
-    .btn-add:active { transform: translateY(0); }
-
-    /* ── Filter tabs ── */
-    .filters {
-      display: flex;
-      gap: 8px;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      line-height: 1.6;
       margin-bottom: 24px;
     }
 
-    .filter-btn {
-      background: transparent;
-      border: 1px solid var(--border);
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .field label {
       color: var(--muted);
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 14px 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(109, 231, 255, 0.12);
+    }
+
+    input::placeholder {
+      color: #718098;
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn {
+      border-radius: 8px;
+      border: 1px solid transparent;
+      min-height: 46px;
+      padding: 0 18px;
+      font-weight: 800;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .primary-btn {
+      width: 100%;
+      color: #071016;
+      background: linear-gradient(90deg, var(--lime), var(--cyan));
+    }
+
+    .ghost-btn {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .danger-btn {
+      color: var(--danger);
+      background: rgba(255, 107, 107, 0.1);
+      border-color: rgba(255, 107, 107, 0.28);
+    }
+
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .app-screen {
+      display: none;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .user-line {
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .credit-wallet {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 238px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255, 209, 102, 0.12);
+      border: 1px solid rgba(255, 209, 102, 0.28);
+    }
+
+    .credit-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      color: #1b1400;
+      border-radius: 50%;
+      background: var(--gold);
+      font-family: "Space Mono", monospace;
+      font-weight: 700;
+    }
+
+    .credit-number {
+      color: var(--gold);
+      font-family: "Space Mono", monospace;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .credit-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-family: "Space Mono", monospace;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.78fr) minmax(300px, 0.42fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 15px;
+      min-height: 92px;
+    }
+
+    .stat-num {
+      font-family: "Space Mono", monospace;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .input-row .primary-btn {
+      width: auto;
+      white-space: nowrap;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
     }
 
     .filter-btn.active,
     .filter-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(0,229,160,0.05);
+      color: #071016;
+      border-color: transparent;
+      background: var(--lime);
     }
 
-    /* ── Task list ── */
-    #task-list { display: flex; flex-direction: column; gap: 10px; }
+    #task-list {
+      display: grid;
+      gap: 10px;
+    }
 
     .task-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex;
+      border-radius: 8px;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto 34px;
+      gap: 12px;
       align-items: center;
-      gap: 14px;
-      animation: slideIn 0.3s ease;
-      transition: border-color 0.2s, transform 0.15s;
     }
 
-    .task-item:hover { border-color: #353b4d; transform: translateX(3px); }
-    .task-item.done { opacity: 0.55; }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .task-item.done {
+      opacity: 0.66;
     }
 
     .task-check {
-      width: 22px; height: 22px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      flex-shrink: 0;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
       background: transparent;
+      color: #071016;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
     }
 
-    .task-check:hover { border-color: var(--accent); }
-    .task-check.checked { background: var(--accent); border-color: var(--accent); }
-    .task-check.checked::after { content: '✓'; color: #0d0f14; font-size: 13px; font-weight: 700; }
+    .task-check.checked {
+      border-color: var(--lime);
+      background: var(--lime);
+    }
 
     .task-title {
-      flex: 1;
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.4;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
     }
 
     .task-item.done .task-title {
@@ -263,54 +417,123 @@
     }
 
     .task-meta {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
       color: var(--muted);
-      flex-shrink: 0;
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
     }
 
     .btn-delete {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--muted);
-      width: 30px; height: 30px;
+      width: 34px;
+      height: 34px;
+      color: var(--danger);
+      border: 1px solid rgba(255, 107, 107, 0.22);
+      background: rgba(255, 107, 107, 0.08);
       border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.2s;
     }
 
-    .btn-delete:hover { color: var(--warn); border-color: var(--warn); background: rgba(255,94,94,0.08); }
-
-    /* ── Empty state ── */
     .empty {
       text-align: center;
-      padding: 60px 20px;
       color: var(--muted);
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 48px 18px;
+      font-family: "Space Mono", monospace;
+      font-size: 13px;
     }
 
-    .empty-icon { font-size: 48px; margin-bottom: 16px; }
-    .empty p { font-family: 'Space Mono', monospace; font-size: 13px; }
+    .side-stack {
+      display: grid;
+      gap: 20px;
+    }
 
-    /* ── Toast ── */
+    .rule-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .rule {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .rule strong {
+      color: var(--ink);
+    }
+
+    .pipeline {
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .pipeline-title {
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .pipeline-stages {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stage {
+      min-height: 76px;
+      display: grid;
+      align-content: center;
+      gap: 7px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .stage-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 18px var(--cyan);
+    }
+
+    .stage.active .stage-dot {
+      background: var(--pink);
+      box-shadow: 0 0 18px var(--pink);
+    }
+
+    .stage-label {
+      color: var(--muted);
+      font-family: "Space Mono", monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
     #toast {
       position: fixed;
-      bottom: 32px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--card);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-family: 'Space Mono', monospace;
-      font-size: 13px;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(18px);
       opacity: 0;
-      transition: all 0.3s;
       pointer-events: none;
-      z-index: 100;
-      white-space: nowrap;
+      z-index: 50;
+      max-width: calc(100% - 32px);
+      color: var(--ink);
+      background: var(--panel-strong);
+      border: 1px solid rgba(109, 231, 255, 0.38);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: "Space Mono", monospace;
+      font-size: 13px;
+      transition: opacity 0.25s, transform 0.25s;
+      box-shadow: var(--shadow);
     }
 
     #toast.show {
@@ -318,250 +541,328 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ── Pipeline status bar ── */
-    .pipeline {
-      margin-top: 56px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      background: var(--card);
+    @media (max-width: 860px) {
+      .auth-screen,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .credit-wallet {
+        width: 100%;
+      }
     }
 
-    .pipeline-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 20px;
-    }
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 20px, 1100px);
+        padding-top: 18px;
+      }
 
-    .pipeline-stages {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      flex-wrap: wrap;
-      row-gap: 12px;
-    }
+      .auth-card,
+      .panel,
+      .pipeline {
+        padding: 18px;
+      }
 
-    .stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-      min-width: 80px;
-    }
+      .stats,
+      .pipeline-stages {
+        grid-template-columns: 1fr;
+      }
 
-    .stage-dot {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      border: 2px solid var(--border);
-      background: var(--surface);
-      position: relative;
-    }
+      .input-row {
+        flex-direction: column;
+      }
 
-    .stage-dot.done { background: rgba(0,229,160,0.1); border-color: var(--accent); }
-    .stage-dot.active { background: rgba(124,108,255,0.1); border-color: var(--accent2); animation: pulse 1.5s infinite; }
+      .input-row .primary-btn {
+        width: 100%;
+      }
 
-    .stage-label {
-      font-size: 10px;
-      font-family: 'Space Mono', monospace;
-      color: var(--muted);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+      .task-item {
+        grid-template-columns: 28px minmax(0, 1fr) 34px;
+      }
 
-    .stage-arrow {
-      color: var(--border);
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-bottom: 22px;
+      .task-meta {
+        grid-column: 2 / 4;
+      }
     }
   </style>
 </head>
 <body>
-<div class="container">
-
-  <header>
-    <div class="badge">CI/CD Pipeline Project</div>
-    <h1>Student<br/><span>Task Manager</span></h1>
-    <p class="subtitle">// Node.js + Express + Docker + GitHub Actions</p>
-  </header>
-
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num green" id="total-count">0</div>
-      <div class="stat-label">Total</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num purple" id="pending-count">0</div>
-      <div class="stat-label">Pending</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" style="color:var(--accent)" id="done-count">0</div>
-      <div class="stat-label">Completed</div>
-    </div>
-  </div>
-
-  <!-- Input -->
-  <div class="input-row">
-    <input type="text" id="task-input" placeholder="Add a new task... e.g. Complete Lab 5" maxlength="100"/>
-    <button class="btn-add" onclick="addTask()">+ Add Task</button>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-    <button class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
-    <button class="filter-btn" onclick="setFilter('done', this)">Done</button>
-  </div>
-
-  <!-- Task List -->
-  <div id="task-list"></div>
-
-  <!-- CI/CD Pipeline Visual -->
-  <div class="pipeline">
-    <div class="pipeline-title">// CI/CD Pipeline Stages</div>
-    <div class="pipeline-stages">
-      <div class="stage">
-        <div class="stage-dot done">🔀</div>
-        <div class="stage-label">Git Push</div>
+  <main class="shell">
+    <section class="auth-screen" id="auth-screen">
+      <div class="brand-copy">
+        <div class="badge">Student focus system</div>
+        <h1>Task Manager <span class="gradient-text">with credits</span></h1>
+        <p class="lead">Sign in to enter a more playful workspace where every task costs a little focus and completed work pays credits back.</p>
       </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-dot done">🧪</div>
-        <div class="stage-label">Jest Tests</div>
+
+      <form class="auth-card" id="login-form">
+        <h2 class="card-title">Authenticate</h2>
+        <p class="card-copy">Your task session starts with 10 credits. Add tasks for 1 credit and earn 3 credits the first time you complete each task.</p>
+        <div class="field">
+          <label for="name-input">Name</label>
+          <input type="text" id="name-input" placeholder="Madhura" maxlength="40" required />
+        </div>
+        <div class="field">
+          <label for="email-input">Email</label>
+          <input type="email" id="email-input" placeholder="you@example.com" maxlength="80" required />
+        </div>
+        <button class="primary-btn" type="submit">Enter Dashboard</button>
+      </form>
+    </section>
+
+    <section class="app-screen" id="app-screen">
+      <div class="topbar">
+        <div>
+          <div class="badge">CI/CD Pipeline Project</div>
+          <h1>Student <span class="gradient-text">Task Manager</span></h1>
+          <p class="user-line" id="user-line"></p>
+        </div>
+
+        <div class="credit-wallet" aria-live="polite">
+          <div class="credit-icon">$</div>
+          <div>
+            <div class="credit-number" id="credit-count">0</div>
+            <div class="credit-label">Available Credits</div>
+          </div>
+          <button class="ghost-btn" type="button" onclick="logout()">Logout</button>
+        </div>
       </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-dot done">🔍</div>
-        <div class="stage-label">SonarQube</div>
+
+      <div class="grid">
+        <section class="panel">
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-num" style="color: var(--cyan)" id="total-count">0</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" style="color: var(--pink)" id="pending-count">0</div>
+              <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" style="color: var(--lime)" id="done-count">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <input type="text" id="task-input" placeholder="Add a new task..." maxlength="100" />
+            <button class="primary-btn" type="button" onclick="addTask()">Add Task</button>
+          </div>
+
+          <div class="filters">
+            <button class="filter-btn active" type="button" onclick="setFilter('all', this)">All</button>
+            <button class="filter-btn" type="button" onclick="setFilter('pending', this)">Pending</button>
+            <button class="filter-btn" type="button" onclick="setFilter('done', this)">Done</button>
+          </div>
+
+          <div id="task-list"></div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel">
+            <h2 class="card-title">Credits</h2>
+            <div class="rule-list">
+              <div class="rule"><span>Add a task</span><strong>-1</strong></div>
+              <div class="rule"><span>Complete a task</span><strong>+3</strong></div>
+              <div class="rule"><span>Reward limit</span><strong>Once</strong></div>
+            </div>
+          </section>
+
+          <section class="pipeline">
+            <div class="pipeline-title">Pipeline stages</div>
+            <div class="pipeline-stages">
+              <div class="stage"><div class="stage-dot"></div><div class="stage-label">Git Push</div></div>
+              <div class="stage"><div class="stage-dot"></div><div class="stage-label">Jest Tests</div></div>
+              <div class="stage"><div class="stage-dot"></div><div class="stage-label">SonarQube</div></div>
+              <div class="stage"><div class="stage-dot"></div><div class="stage-label">Docker</div></div>
+              <div class="stage"><div class="stage-dot"></div><div class="stage-label">Registry</div></div>
+              <div class="stage active"><div class="stage-dot"></div><div class="stage-label">Deploy</div></div>
+            </div>
+          </section>
+        </aside>
       </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-dot done">🐳</div>
-        <div class="stage-label">Docker Build</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-dot done">☁️</div>
-        <div class="stage-label">Docker Hub</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-dot active">🚀</div>
-        <div class="stage-label">Deploy</div>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-</div>
+  <div id="toast"></div>
 
-<div id="toast"></div>
+  <script>
+    let currentFilter = 'all';
+    let currentUser = JSON.parse(localStorage.getItem('taskUser') || 'null');
 
-<script>
-  let currentFilter = 'all';
+    const authScreen = document.getElementById('auth-screen');
+    const appScreen = document.getElementById('app-screen');
 
-  async function loadTasks() {
-    const res = await fetch('/api/tasks');
-    const data = await res.json();
-    renderTasks(data.tasks);
-  }
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name-input').value.trim();
+      const email = document.getElementById('email-input').value.trim();
 
-  function renderTasks(tasks) {
-    const list = document.getElementById('task-list');
-    const total = tasks.length;
-    const done = tasks.filter(t => t.completed).length;
-    const pending = total - done;
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+      const data = await res.json();
 
-    document.getElementById('total-count').textContent = total;
-    document.getElementById('done-count').textContent = done;
-    document.getElementById('pending-count').textContent = pending;
+      if (!res.ok) {
+        showToast(data.message || 'Login failed');
+        return;
+      }
 
-    const filtered = tasks.filter(t => {
-      if (currentFilter === 'pending') return !t.completed;
-      if (currentFilter === 'done') return t.completed;
-      return true;
+      currentUser = data.user;
+      localStorage.setItem('taskUser', JSON.stringify(currentUser));
+      showApp();
+      updateCredits(data.credits);
+      loadTasks();
+      showToast('Welcome, ' + currentUser.name);
     });
 
-    if (filtered.length === 0) {
-      list.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">📋</div>
-          <p>No tasks here. Add one above!</p>
-        </div>`;
-      return;
+    function showApp() {
+      if (!currentUser) return;
+      authScreen.style.display = 'none';
+      appScreen.style.display = 'block';
+      document.getElementById('user-line').textContent = currentUser.name + ' / ' + currentUser.email;
     }
 
-    list.innerHTML = filtered.map(task => {
-      const date = new Date(task.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
-      return `
-        <div class="task-item ${task.completed ? 'done' : ''}" id="task-${task.id}">
-          <div class="task-check ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
-          <span class="task-title">${escapeHtml(task.title)}</span>
-          <span class="task-meta">${date}</span>
-          <button class="btn-delete" onclick="deleteTask(${task.id})" title="Delete">✕</button>
-        </div>`;
-    }).join('');
-  }
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('taskUser');
+      appScreen.style.display = 'none';
+      authScreen.style.display = 'grid';
+      showToast('Signed out');
+    }
 
-  async function addTask() {
-    const input = document.getElementById('task-input');
-    const title = input.value.trim();
-    if (!title) { showToast('⚠ Please enter a task title'); return; }
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      const data = await res.json();
+      updateCredits(data.credits);
+      renderTasks(data.tasks);
+    }
 
-    const res = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title })
-    });
-    if (res.ok) {
+    function updateCredits(value) {
+      if (typeof value === 'number') {
+        document.getElementById('credit-count').textContent = value;
+      }
+    }
+
+    function renderTasks(tasks) {
+      const list = document.getElementById('task-list');
+      const total = tasks.length;
+      const done = tasks.filter(task => task.completed).length;
+      const pending = total - done;
+
+      document.getElementById('total-count').textContent = total;
+      document.getElementById('done-count').textContent = done;
+      document.getElementById('pending-count').textContent = pending;
+
+      const filtered = tasks.filter(task => {
+        if (currentFilter === 'pending') return !task.completed;
+        if (currentFilter === 'done') return task.completed;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty">No tasks here yet.</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(task => {
+        const date = new Date(task.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        const checked = task.completed ? 'checked' : '';
+        const doneClass = task.completed ? 'done' : '';
+
+        return `
+          <div class="task-item ${doneClass}" id="task-${task.id}">
+            <button class="task-check ${checked}" type="button" onclick="toggleTask(${task.id})">${task.completed ? 'OK' : ''}</button>
+            <span class="task-title">${escapeHtml(task.title)}</span>
+            <span class="task-meta">${date}</span>
+            <button class="btn-delete" type="button" onclick="deleteTask(${task.id})" title="Delete">x</button>
+          </div>`;
+      }).join('');
+    }
+
+    async function addTask() {
+      const input = document.getElementById('task-input');
+      const title = input.value.trim();
+
+      if (!title) {
+        showToast('Please enter a task title');
+        return;
+      }
+
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.message || 'Could not add task');
+        return;
+      }
+
       input.value = '';
-      showToast('✓ Task added');
+      updateCredits(data.credits);
+      showToast('Task added. 1 credit spent.');
       loadTasks();
     }
-  }
 
-  async function toggleTask(id) {
-    await fetch(`/api/tasks/${id}`, { method: 'PATCH' });
-    loadTasks();
-  }
+    async function toggleTask(id) {
+      const res = await fetch('/api/tasks/' + id, { method: 'PATCH' });
+      const data = await res.json();
+      updateCredits(data.credits);
+      showToast(data.creditsEarned > 0 ? 'Completed. Credits updated.' : 'Task updated.');
+      loadTasks();
+    }
 
-  async function deleteTask(id) {
-    await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
-    showToast('✓ Task deleted');
-    loadTasks();
-  }
+    async function deleteTask(id) {
+      const res = await fetch('/api/tasks/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      updateCredits(data.credits);
+      showToast('Task deleted');
+      loadTasks();
+    }
 
-  function setFilter(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    loadTasks();
-  }
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(button => button.classList.remove('active'));
+      btn.classList.add('active');
+      loadTasks();
+    }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-  // Enter key support
-  document.getElementById('task-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addTask();
-  });
+    document.getElementById('task-input').addEventListener('keydown', event => {
+      if (event.key === 'Enter') addTask();
+    });
 
-  loadTasks();
-</script>
+    if (currentUser) {
+      showApp();
+      loadTasks();
+    }
+  </script>
 </body>
 </html>

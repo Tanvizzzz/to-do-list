@@ -6,6 +6,40 @@ beforeEach(async () => {
   await request(app).post('/api/tasks/reset');
 });
 
+describe('POST /api/auth/login', () => {
+  test('should authenticate a demo user with name and email', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ name: 'Madhura', email: 'madhura@example.com' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.user.name).toBe('Madhura');
+    expect(res.body.credits).toBe(10);
+  });
+
+  test('should return 400 when login details are missing', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ name: 'Madhura' });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+});
+
+describe('GET /api/credits', () => {
+  test('should return the current credits and rules', async () => {
+    const res = await request(app).get('/api/credits');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.credits).toBe(10);
+    expect(res.body.rules.taskCreationCost).toBe(1);
+    expect(res.body.rules.taskCompletionReward).toBe(3);
+  });
+});
+
 // ── GET /api/tasks ──────────────────────────────────────
 describe('GET /api/tasks', () => {
   test('should return empty array initially', async () => {
@@ -33,6 +67,7 @@ describe('POST /api/tasks', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.task.title).toBe('Complete Docker Lab');
     expect(res.body.task.completed).toBe(false);
+    expect(res.body.credits).toBe(9);
   });
 
   test('should return 400 if title is missing', async () => {
@@ -46,6 +81,13 @@ describe('POST /api/tasks', () => {
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
   });
+
+  test('should spend one credit when creating a task', async () => {
+    await request(app).post('/api/tasks').send({ title: 'Spend a credit' });
+
+    const res = await request(app).get('/api/credits');
+    expect(res.body.credits).toBe(9);
+  });
 });
 
 // ── PATCH /api/tasks/:id ────────────────────────────────
@@ -56,6 +98,8 @@ describe('PATCH /api/tasks/:id', () => {
     const res = await request(app).patch(`/api/tasks/${id}`);
     expect(res.statusCode).toBe(200);
     expect(res.body.task.completed).toBe(true);
+    expect(res.body.credits).toBe(12);
+    expect(res.body.creditsEarned).toBe(3);
   });
 
   test('should toggle task back to incomplete', async () => {
@@ -69,6 +113,19 @@ describe('PATCH /api/tasks/:id', () => {
   test('should return 404 for non-existent task', async () => {
     const res = await request(app).patch('/api/tasks/999');
     expect(res.statusCode).toBe(404);
+  });
+
+  test('should award completion credits only once per task', async () => {
+    const create = await request(app).post('/api/tasks').send({ title: 'No duplicate credits' });
+    const id = create.body.task.id;
+
+    await request(app).patch(`/api/tasks/${id}`);
+    await request(app).patch(`/api/tasks/${id}`);
+    const res = await request(app).patch(`/api/tasks/${id}`);
+
+    expect(res.body.task.completed).toBe(true);
+    expect(res.body.credits).toBe(12);
+    expect(res.body.creditsEarned).toBe(0);
   });
 });
 
